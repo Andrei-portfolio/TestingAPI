@@ -1,7 +1,9 @@
 package tests;
 
 import entities.Task;
+import helpers.ToDoHelper;
 import helpers.ToDoHelperApache;
+import org.apache.http.client.HttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -16,20 +18,25 @@ import static org.junit.jupiter.api.Assertions.*;
  должен 3 элемента*/
 
 public class ToDoBusinessTests {
-    private ToDoHelperApache toDoHelperApache;//Объявили ToDoHelper, отдельно вынесенный класс в котором у нас создаётся задача
+
+    private ToDoHelper toDoHelper;//Объявили ToDoHelper, отдельно вынесенный класс в котором у
+    // нас создаётся задача
 
     @BeforeEach
     public void setUp(){
-        toDoHelperApache = new ToDoHelperApache();
-    }
+        toDoHelper = new ToDoHelperApache();
+    } /* В ЧЕМ ПЛЮСЫ ДАННОГО МЕТОДА И СОЗДАННОГО НАМИ КЛАССА toDoHelperApache? А В ТОМ, ЧТО ЕСЛИ УСЛОВНО ГОВОРЯ
+    НАМ ЗАБЛОКИРУЮТ В РОССИИ ИНСТРУМЕНТ Apache, ТО МЫ ЛЕГКО СМОЖЕТ ПЕРЕЙТИ НА ДРУГОЙ ИНСРУМЕНТ (клиент), НАПРИМЕР
+    OkHttp. ТО НАМ НУЖНО БУДЕТ ВСЕГО НАВСЕГО В ДАННОЙ СТРОКЕ СМЕНИТЬ ВСЕГО ОДНО СЛОВО ToDoHelperApache НА
+    ToDoHelperOkHttp. И ТЕСТЫ ПРОДОЛЖАТ РАБОТАТЬ*/
 
     @Test
     @DisplayName("Создание объекта")
     @Disabled("Тест падает из-за бага задача jira.com/BUG-12523532")// Если закомитить, то тест можно будет запустить
     public void createTask() throws IOException {
-        Task myTask = toDoHelperApache.createTask();
+        Task myTask = toDoHelper.createTask();
 
-            List<Task> tasks = toDoHelperApache.getTasks();
+            List<Task> tasks = toDoHelper.getTasks();
         for (Task task : tasks) {
             if (task.getId() == myTask.getId())
             {
@@ -52,16 +59,16 @@ public class ToDoBusinessTests {
     что в данном шаге мы удалили все элементы. Следующим шагом, мы создадим их*/
 
         // создать три элемента
-        toDoHelperApache.createTask();
-        toDoHelperApache.createTask();
-        toDoHelperApache.createTask();
+        toDoHelper.createTask();
+        toDoHelper.createTask();
+        toDoHelper.createTask();
 
         /* Откуда же нам брать createTask? Данны метод createTask, который создаёт задачи, у нас уже есть,
         но есть в другом классе ToDoContractTests. Так как же быть? Можно его скопировать и перенести сюда.
         Но мы же помним главный принцип, что от одинакового кода нужно избавляться. Поэтому перенесём
         метод createTask в отдельный класс в папке helpers*/
 
-        List<Task> tasks = toDoHelperApache.getTasks();
+        List<Task> tasks = toDoHelper.getTasks();
         assertEquals(3, tasks.size());// ПРОВЕРКА, ЧТО в СПИСКЕ не менее 3-х задач
 
         System.out.println(tasks);
