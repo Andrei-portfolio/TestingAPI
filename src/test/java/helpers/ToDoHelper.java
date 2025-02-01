@@ -20,6 +20,6 @@ public interface ToDoHelper {
 
     public List<Task> getTasks() throws IOException;
 
-
+    public void deleteTask(Task task) throws IOException;
 }
 

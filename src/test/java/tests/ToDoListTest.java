@@ -1,6 +1,7 @@
 package tests;
 
-import okhttp3.internal.concurrent.Task;
+
+import entities.Task;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -44,20 +45,34 @@ public class ToDoListTest {
                                                                             // Если их несколько, то возвращает первый попавшийся
         assertEquals("application/json; charset=utf-8", contentType.getValue());
     }
-//
-//    @Test
-//    public void instancioTest() {
-//        // Создать случ. задачу
-//        Task task = Instancio.create(Task.class);
-//        //System.out.println(task);
-//
-//        // Более гибкая настройка объекта
-//        Task task1 = Instancio.of(Task.class).generate(field("title"), generators -> generators.text().loremIpsum()).create();
-//        System.out.println(task1);
-//
-//        // Создать 10 случ. задач
-//        List<Task> tasks = Instancio.ofList(Task.class).size(10).create();
-//        //System.out.println(tasks);
+
+    /*
+фэйкер создаёт/генерирует строки, числа (персонажей из фильмов, имена, фамилии, улицы, номера домов....) и т.д.,
+а instancio может создать объект вашего класса. Т.е когда мы не хотим сами замарачиваться, через него можно это
+сделать быстрее, чем через фэйкер. Скачать instancio можем на сайте
+https://mvnrepository.com/artifact/org.instancio/instancio-junit/5.0.2. Далее устанавливаем в pom.xml
+Почитать же про неё можно на сайте https://www.instancio.org/user-guide/.
+
+
+ НИЖЕ ПРИВЕДЕН ТЕСТ С ИСПОЛЬЗОВАНИЕМ БИБЛИОТЕКИ instancio И ГЕНЕРАЦИИ СЛУЧАЙНЫХ ДАННЫХ ПО ЗАДАЧЕ
+ (id, title, completed).
+
+ */
+
+    @Test
+    public void instancioTest() {
+        // Создать случ. задачу
+        Task task = Instancio.create(Task.class);
+        System.out.println(task);
+
+        // Более гибкая настройка объекта
+        Task task1 = Instancio.of(Task.class).generate(field("title"), generators -> generators.text().loremIpsum()).create();
+        System.out.println(task1);
+
+        // Создать 10 случ. задач
+        List<Task> tasks = Instancio.ofList(Task.class).size(10).create();
+        //System.out.println(tasks);
     }
+}
 
 

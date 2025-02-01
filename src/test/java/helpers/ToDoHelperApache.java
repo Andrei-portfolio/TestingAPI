@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -15,10 +16,14 @@ import entities.Task;
 import java.io.IOException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ToDoHelperApache implements ToDoHelper{// Чтобы проще было перейти с Apache на что то другуе, используем
                                                     // интерфейс
 
     private final static String URL = "https://todo-app-sky.herokuapp.com/";
+
+    private final static int CODE_OK = 200;
 
     private final HttpClient httpClient;
 
@@ -51,4 +56,14 @@ public class ToDoHelperApache implements ToDoHelper{// Чтобы проще б�
         return List.of(objectMapper.readValue(body, Task[].class));
 
          }
+
+    public void deleteTask(Task task) throws IOException {
+        HttpDelete httpDelete = new HttpDelete(URL + task.getId());// В скобках обозначает, что при
+                                                                      // удалении отпр. URL и id задачи
+        HttpResponse httpResponse = httpClient.execute(httpDelete);
+        assertEquals(CODE_OK, httpResponse.getStatusLine().getStatusCode());// Ассерт добавили, чтобы быть
+        // уверенными, что тест отработает с кодом 200
+    }
+
+
 }

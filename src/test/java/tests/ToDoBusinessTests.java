@@ -3,6 +3,7 @@ package tests;
 import entities.Task;
 import helpers.ToDoHelper;
 import helpers.ToDoHelperApache;
+import helpers.ToDoHelperOkHttp;
 import org.apache.http.client.HttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
  /* Бизнес тесты - это тесты, где проверяется бизнес логика, например если у нас 3 элемента, то вернуть
@@ -23,8 +25,8 @@ public class ToDoBusinessTests {
     // нас создаётся задача
 
     @BeforeEach
-    public void setUp(){
-        toDoHelper = new ToDoHelperApache();
+    public void setUp() {
+        toDoHelper = new ToDoHelperOkHttp();
     } /* В ЧЕМ ПЛЮСЫ ДАННОГО МЕТОДА И СОЗДАННОГО НАМИ КЛАССА toDoHelperApache? А В ТОМ, ЧТО ЕСЛИ УСЛОВНО ГОВОРЯ
     НАМ ЗАБЛОКИРУЮТ В РОССИИ ИНСТРУМЕНТ Apache, ТО МЫ ЛЕГКО СМОЖЕТ ПЕРЕЙТИ НА ДРУГОЙ ИНСРУМЕНТ (клиент), НАПРИМЕР
     OkHttp. ТО НАМ НУЖНО БУДЕТ ВСЕГО НАВСЕГО В ДАННОЙ СТРОКЕ СМЕНИТЬ ВСЕГО ОДНО СЛОВО ToDoHelperApache НА
@@ -36,15 +38,14 @@ public class ToDoBusinessTests {
     public void createTask() throws IOException {
         Task myTask = toDoHelper.createTask();
 
-            List<Task> tasks = toDoHelper.getTasks();
+        List<Task> tasks = toDoHelper.getTasks();
         for (Task task : tasks) {
-            if (task.getId() == myTask.getId())
-            {
+            if (task.getId() == myTask.getId()) {
                 assertNotNull(task);
                 assertFalse(task.getCompleted());//Если закомитить данную строку, то тест пройдёт, т.к. мы у boolian
-                                                // ожидаем, задача выполнена (тру) или нет (фалсе), а в to do
-                                                // при создании задачи, она изначально создаётся со статусом null.
-                                                // Это БАГ
+                // ожидаем, задача выполнена (тру) или нет (фалсе), а в to do
+                // при создании задачи, она изначально создаётся со статусом null.
+                // Это БАГ
             }
         }
     }
@@ -73,16 +74,18 @@ public class ToDoBusinessTests {
 
         System.out.println(tasks);
     }
-        /*ВАЖНО!!!!!!! Перед запуском данного теста, в To-Do лучше удалить все задачи*/
+    /*ВАЖНО!!!!!!! Перед запуском данного теста, в To-Do лучше удалить все задачи*/
 
-/*
+
     @Test
     @DisplayName("Удаление задачи")
     public void deleteTask() throws IOException {
-        Task myTask = toDoHelper.createTask();
-        toDoHelper.deleteTask(myTask);
+        Task myTask = toDoHelper.createTask();// Чтобы удалить задачу, её сначала нужно создать
+        toDoHelper.deleteTask(myTask);// По началу deleteTas не опрделялось, т.к. мы забыли его добавить в ToDoHelper.
+        // В скобках передаём таску для удаления
 
-        List<Task> tasks = toDoHelper.getTasks();
-        assertThat(tasks).doesNotContain(myTask);*/
+        List<Task> tasks = toDoHelper.getTasks();//проверяем, что у нас нет таски с id myTask
+        assertThat(tasks).doesNotContain(myTask);// assertThat из библиотеки assertj-core, которую добавили в pom.xml
 
+    }
 }
