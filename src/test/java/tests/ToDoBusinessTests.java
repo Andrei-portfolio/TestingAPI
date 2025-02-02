@@ -26,7 +26,8 @@ public class ToDoBusinessTests {
 
     @BeforeEach
     public void setUp() {
-        toDoHelper = new ToDoHelperOkHttp();
+        toDoHelper = new ToDoHelperOkHttp();//ОЧЕНЬ ВАЖНО!!! ЗДЕСЬ МЫ МОЖЕМ СМЕНИТЬ ToDoHelperOkHttp() НА
+        // ToDoHelperApache И У НАС ВСЕ ТЕСТЫ ТАКЖЕ ОТРАБОТАЮТ.
     } /* В ЧЕМ ПЛЮСЫ ДАННОГО МЕТОДА И СОЗДАННОГО НАМИ КЛАССА toDoHelperApache? А В ТОМ, ЧТО ЕСЛИ УСЛОВНО ГОВОРЯ
     НАМ ЗАБЛОКИРУЮТ В РОССИИ ИНСТРУМЕНТ Apache, ТО МЫ ЛЕГКО СМОЖЕТ ПЕРЕЙТИ НА ДРУГОЙ ИНСРУМЕНТ (клиент), НАПРИМЕР
     OkHttp. ТО НАМ НУЖНО БУДЕТ ВСЕГО НАВСЕГО В ДАННОЙ СТРОКЕ СМЕНИТЬ ВСЕГО ОДНО СЛОВО ToDoHelperApache НА
@@ -51,7 +52,8 @@ public class ToDoBusinessTests {
     }
 
     @Test
-    @DisplayName("Получение списка задач из 3 элементов")
+    @DisplayName("Получение списка задач из 3 элементов")//*ВАЖНО!!!!!!! Перед запуском данного теста, в To-Do
+                                                        // лучше удалить все задачи*/
     public void getTasksBodyValidTypes() throws IOException {
         // удалить все элементы
 
@@ -76,7 +78,6 @@ public class ToDoBusinessTests {
     }
     /*ВАЖНО!!!!!!! Перед запуском данного теста, в To-Do лучше удалить все задачи*/
 
-
     @Test
     @DisplayName("Удаление задачи")
     public void deleteTask() throws IOException {
@@ -86,6 +87,5 @@ public class ToDoBusinessTests {
 
         List<Task> tasks = toDoHelper.getTasks();//проверяем, что у нас нет таски с id myTask
         assertThat(tasks).doesNotContain(myTask);// assertThat из библиотеки assertj-core, которую добавили в pom.xml
-
     }
 }
