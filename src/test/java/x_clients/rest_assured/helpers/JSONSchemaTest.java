@@ -2,14 +2,14 @@ package x_clients.rest_assured.helpers;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.isA;
 
-import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
+//import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import org.junit.jupiter.api.Test;
 
 public class JSONSchemaTest {
 
-    @Test
+    /*@Test
     public void checkGetCompanyResponseBody() {
         given()
                 .baseUri("https://x-clients-be.onrender.com/")
@@ -54,5 +54,5 @@ public class JSONSchemaTest {
                 .when().get("{id}", 12)
                 .then()
                 .statusCode(200);
-    }
+    }*/
 }

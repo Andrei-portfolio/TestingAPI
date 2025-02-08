@@ -1,6 +1,12 @@
 package x_clients.rest_assured.helpers;
 
+import static io.restassured.RestAssured.basePath;
 import static io.restassured.RestAssured.given;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.restassured.RestAssured;
@@ -10,40 +16,65 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import x_clients.rest_assured.entity.AuthResponse;
 import x_clients.rest_assured.entity.CreateCompanyRequest;
 import x_clients.rest_assured.entity.CreateCompanyResponse;
+
+/* Класс №1
+REST - assured это инструмент для тестирования. И это не аналог Apache и OkHttp Это больше чем клиент.
+Нужно научиться разграничивать. У нас есть Apache и OkHttp, предназначенные для отправки запросов и получения
+ответов. А далее с ответами, мы делаем всё что захотим, тестируем, но для этого нам нужно устанавливать
+с junit. А REST - assured, это не только клиент, но и инструмент для тестирования. Он позволяет посылать
+запросы и валидировать ответы. И это как плюс, так и минус. С его помощью тестировать легче, чем ч/з
+Apache и OkHttp, кроме того не нужны асерты от джиюнита.
+
+Скачаем через https://mvnrepository.com/artifact/io.rest-assured/rest-assured/5.5.0 инструмент REST - assured.
+Документацию можно посмотреть на https://rest-assured.io/. В docs в Getting started и Usage Guide
+можно почитать документацию до 7-го пункта. Там очень много возможностей
+В REST - assured принято переносить длинный код на несколько строчек. Самое главное, при переносе,
+точку оставлять не в конце строки, а в начале следующей.
+*/
 
 public class CompanyContractTest {
 
     private final static String URL = "https://x-clients-be.onrender.com/";
 
-    private static ApiCompanyHelper apiCompanyHelper;
-
-    private static AuthHelper authHelper;
+//    private static ApiCompanyHelper apiCompanyHelper;
+//
+//    private static AuthHelper authHelper;
 
     @BeforeAll
     public static void setUp() {
-        RestAssured.baseURI = URL;
-        apiCompanyHelper = new ApiCompanyHelper();
-        authHelper = new AuthHelper();
-        String userToken = authHelper.authAndGetToken("leonardo", "leads");
-        RestAssured.requestSpecification = new RequestSpecBuilder().build().header("x-client-token", userToken);
+        RestAssured.baseURI = URL;//чтобы не задавать в каждом тесте baseUri, пропишем
+        // его здесь в виде переменной из RestAssured
+
+//        apiCompanyHelper = new ApiCompanyHelper();
+//        authHelper = new AuthHelper();
+//        String userToken = authHelper.authAndGetToken("leonardo", "leads");
+//        RestAssured.requestSpecification = new RequestSpecBuilder().build().header("x-client-token", userToken);
     }
 
-    // given
-    // when
-    // then
+    /*Рассмотрим три основных метода
+    // given - ДАНО (условия/настройки, которые даны: URL, хедеры и т.д.)
+    // when - КОГДА (показываем, какой запрос мы отправляем: get, post и т.д.)
+    // then - ТОГДА (тогда проверяй его на код 200, например. Валидирование)
+    Проще говоря, у нас получается 1 этап, у нас есть URL, 2 этап
+
+    */
     @Test
     @DisplayName("Код ответа при получении списка компаний")
     public void getCompanyList() {
-        given().log().all()  // ДАНО:
-                .basePath("company")
+        given()  // ДАНО:
+                //.baseUri(URL + "company")// Данный код закомитим, т.к мы задали URL выше в
+                // @BeforeAll. Поэтому, теперь нижней строкой пропишем basePath, без URL
+                .basePath ("company")
                 .when()     // КОГДА
-                .get() // ШЛЕШЬ ГЕТ ЗАПРОС
-                .then() // ТОГДА ПРОВЕРЬ СЛЕДУЮЩЕЕ:
+                .get() // ШЛЕШЬ ГЕТ ЗАПРОС (Response)
+                .then() // ТОГДА ПРОВЕРЬ СЛЕДУЮЩЕЕ: статус код и хэдер
                 .statusCode(200)
                 .header("Content-Type", "application/json; charset=utf-8");
 
+//        А теперь всё тоже самое, но в другом менее восприимчивом стиле.
 //        RequestSpecification requestSpecification = given().baseUri(URL + "company");
 //        Response response = requestSpecification.when().get();
 //        ValidatableResponse validatableResponse = response
@@ -53,14 +84,97 @@ public class CompanyContractTest {
     }
 
     @Test
-    @DisplayName("Создание компании")
-    public void createCompany() {
-        CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();
+    @DisplayName("Авторизация")
+    public void authorization () {
+        String jsonBodyToSend = """
+                 {
+                   "username": "leonardo",
+                   "password": "leads"
+                 }
+                """;
 
-        System.out.println(createCompanyResponse.id());
+        String userToken = given()// ДАНО
+                .basePath("auth/login")
+                .body(jsonBodyToSend)
+                .contentType(ContentType.JSON)
+                .when()// КОГДА
+                .post()// ШЛЁШЬ ПОСТ ЗАПРОС
+                .jsonPath().getString("userToken");/* использ. механизм JSONPath. Что это такое?
+                В REST - assured уже вставлен данный механизм. Который позволяет обратиться к
+                какому - либо из полей JSON файла. А можно это сделать с помощью "$.userToken" (но его
+                 не нужно ставить, он установлен по умолчанию), после точки ставим как раз путь (ключ) и
+                получаем значение. Особенно удобен данный метод, если мы обращаемся к полю один раз,
+                но если придётся обращаться неоднократно, то лучьше создать объект класса.
+                Тем самым в REST - assured, мы можем работать с JSON, без создания
+                обжект маппера, как мы это делали ранее.
+                Попрактиваться с JSONPath можно например на сайте https://jsonpath.com/*/
+        System.out.println(userToken);// В данном тесте приведен пример, как по итогам теста мы не будем ничего
+        // сравнивать, а просто вытащим в терминал токен
     }
 
+
     @Test
+    @DisplayName("Создание компании")
+    public void createCompany() {
+        String userToken = authAndGetToken();// Благодаря методу authAndGetToken мы вынесли авторизацию в предусловие
+        String jsonBodyToSend = """
+                {
+                   "name": "RestAssuredCompany",
+                   "description": "MyRestAssuredCompany"
+                 }
+                """;
+
+        String id = given()// ДАНО
+                .basePath("company")
+                .body(jsonBodyToSend)
+                .contentType(ContentType.JSON)
+                .header("x-client-token", userToken)// ВАЖНО: обязательно прокидываем токен, иначе автотест не отработает
+                .when()// КОГДА
+                .post()// ШЛЁШЬ ПОСТ ЗАПРОС
+                .then()
+                .statusCode(201)
+                .body("id", is(greaterThan(0)))// это в REST - assured  есть hamcrest.Matchers.is.
+                                                        // проверяем, что id больше 0
+                .extract().jsonPath().getString("id");// В терминал видим id нашей компании
+
+        System.out.println(id);// В данном тесте приведен пример, как по итогам теста мы кроме сравнения
+        // вытащим в терминал id. В свагере проверяем, на самом ли деле создалась наша компания с данным id
+
+
+        /*CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();
+
+        System.out.println(createCompanyResponse.id());
+    }*/
+    }
+
+    private String authAndGetToken () {// Метод который авторизуется и проверяет токен. Данный метод будем
+        // использовать перед каждым тестом. Тем самым код не будет повторяться
+        String jsonBodyToSend = """
+                 {
+                   "username": "leonardo",
+                   "password": "leads"
+                 }
+                """;
+
+        return given()// ДАНО
+                .basePath("auth/login")
+                .body(jsonBodyToSend)
+                .contentType(ContentType.JSON)
+                .when()// КОГДА
+                .post()// ШЛЁШЬ ПОСТ ЗАПРОС
+                .jsonPath().getString("userToken");/* использ. механизм JSONPath. Что это такое?
+                В REST - assured уже вставлен данный механизм. Который позволяет обратиться к
+                какому - либо из полей JSON файла. А можно это сделать с помощью "$.userToken" (но его
+                 не нужно ставить, он установлен по умолчанию), после точки ставим как раз путь (ключ) и
+                получаем значение. Особенно удобен данный метод, если мы обращаемся к полю один раз,
+                но если придётся обращаться неоднократно, то лучьше создать объект класса.
+                Тем самым в REST - assured, мы можем работать с JSON, без создания
+                обжект маппера, как мы это делали ранее.
+                Попрактиваться с JSONPath можно например на сайте https://jsonpath.com/*/
+    }
+
+
+    /*@Test
     @DisplayName("Удаление компании")
     public void deleteCompany() {
         CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();
@@ -96,5 +210,5 @@ public class CompanyContractTest {
                 .basePath("company")
                 .when()     // КОГДА
                 .get("{id}", id).prettyPrint(); // ШЛЕШЬ ГЕТ ЗАПРОС
-    }
+    }*/
 }
