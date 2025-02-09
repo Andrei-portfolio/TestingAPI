@@ -2,13 +2,10 @@ package x_clients.rest_assured.helpers;
 
 import static io.restassured.RestAssured.basePath;
 import static io.restassured.RestAssured.given;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -16,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import x_clients.rest_assured.entity.AuthRequest;
 import x_clients.rest_assured.entity.AuthResponse;
 import x_clients.rest_assured.entity.CreateCompanyRequest;
 import x_clients.rest_assured.entity.CreateCompanyResponse;
@@ -40,7 +38,6 @@ public class CompanyContractTest {
     private final static String URL = "https://x-clients-be.onrender.com/";
 
 //    private static ApiCompanyHelper apiCompanyHelper;
-//
 //    private static AuthHelper authHelper;
 
     @BeforeAll
@@ -112,7 +109,6 @@ public class CompanyContractTest {
         // сравнивать, а просто вытащим в терминал токен
     }
 
-
     @Test
     @DisplayName("Создание компании")
     public void createCompany() {
@@ -147,6 +143,24 @@ public class CompanyContractTest {
     }*/
     }
 
+    @Test
+    @DisplayName("Получить компанию по id")
+    public void getCompany() {
+        int id = 1294;
+        given()  // ДАНО:
+                .basePath("company")
+                .when()     // КОГДА
+                .get("{id}", id).prettyPrint(); // ШЛЕШЬ ГЕТ ЗАПРОС
+    }
+        /*prettyPrint - помогает нам вывести в консоль необходимые данные. Так, чтобы увидеть данные о компании,
+        необходимо сначала в тесте "Создание компании" посмотреть id компании, вбить этот id в данный тест
+        и после запуска получаем информацию о компании. Обращу вниманее, что в данном тесте нет никаких
+        асертов, мы просто выводим в консоль информацию и видим, как выглядит тело ответа
+
+        Рефактор - это когда берём код, который требует визуальных доработок и от этого сами тесты не должны
+        поменяться, т.е. появляется новая структура, выносятся методы и т.д. Т.е. облагораживание кода
+        */
+
     private String authAndGetToken () {// Метод который авторизуется и проверяет токен. Данный метод будем
         // использовать перед каждым тестом. Тем самым код не будет повторяться
         String jsonBodyToSend = """
@@ -155,6 +169,8 @@ public class CompanyContractTest {
                    "password": "leads"
                  }
                 """;
+
+        AuthRequest authRequest = new AuthRequest("leonardo", "leads");
 
         return given()// ДАНО
                 .basePath("auth/login")
@@ -199,16 +215,5 @@ public class CompanyContractTest {
                 .then()
                 .statusCode(403).extract().asPrettyString();
         System.out.println(errorMessage);
-    }
-
-
-    @Test
-    @DisplayName("Получить компанию по id")
-    public void getCompany() {
-        int id = 100;
-        given()  // ДАНО:
-                .basePath("company")
-                .when()     // КОГДА
-                .get("{id}", id).prettyPrint(); // ШЛЕШЬ ГЕТ ЗАПРОС
     }*/
 }
