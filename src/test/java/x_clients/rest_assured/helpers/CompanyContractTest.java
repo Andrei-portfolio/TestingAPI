@@ -112,17 +112,24 @@ public class CompanyContractTest {
     @Test
     @DisplayName("Создание компании")
     public void createCompany() {
-        String userToken = authAndGetToken();// Благодаря методу authAndGetToken мы вынесли авторизацию в предусловие
-        String jsonBodyToSend = """
-                {
-                   "name": "RestAssuredCompany",
-                   "description": "MyRestAssuredCompany"
-                 }
-                """;
+        String userToken = authAndGetToken("leonardo", "leads");// Благодаря методу authAndGetToken мы вынесли авторизацию в предусловие
+        CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
+//        String jsonBodyToSend = """
+//                {
+//                   "name": "RestAssuredCompany",
+//                   "description": "MyRestAssuredCompany"
+//                 }
+//                """;
+        /*Чтобы вынести наш json также, как мы вынесли его ниже в методе authAndGetToken. То нам нужно также
+         создать класс рекорд (не требует делать конструктор и геттеры, т.к они автоматически создаются, хоть
+         мы их и не видим) CreateCompanyRequest в entity и там пропишем данные поля name и description. Тем самым
+         приведём всё к единобразию. А код выше, закомитим */
 
-        String id = given()// ДАНО
+
+       CreateCompanyResponse createCompanyResponse = given()// ДАНО
                 .basePath("company")
-                .body(jsonBodyToSend)
+                .body(createCompanyRequest)//плюсы REST - assured в том, что в нём уже встроен ObjectMapper от Jackson и он
+                                    // преобразует его в JSON.
                 .contentType(ContentType.JSON)
                 .header("x-client-token", userToken)// ВАЖНО: обязательно прокидываем токен, иначе автотест не отработает
                 .when()// КОГДА
@@ -130,10 +137,11 @@ public class CompanyContractTest {
                 .then()
                 .statusCode(201)
                 .body("id", is(greaterThan(0)))// это в REST - assured  есть hamcrest.Matchers.is.
-                                                        // проверяем, что id больше 0
-                .extract().jsonPath().getString("id");// В терминал видим id нашей компании
+                // проверяем, что id больше 0
+                //.extract().jsonPath().getString("id");// В терминал видим id нашей компании
+                .extract().as(CreateCompanyResponse.class);
 
-        System.out.println(id);// В данном тесте приведен пример, как по итогам теста мы кроме сравнения
+        System.out.println(createCompanyResponse.id());// В данном тесте приведен пример, как по итогам теста мы кроме сравнения
         // вытащим в терминал id. В свагере проверяем, на самом ли деле создалась наша компания с данным id
 
 
@@ -161,25 +169,30 @@ public class CompanyContractTest {
         поменяться, т.е. появляется новая структура, выносятся методы и т.д. Т.е. облагораживание кода
         */
 
-    private String authAndGetToken () {// Метод который авторизуется и проверяет токен. Данный метод будем
+    private String authAndGetToken (String username, String password) {// Метод который авторизуется и проверяет токен. Данный метод будем
         // использовать перед каждым тестом. Тем самым код не будет повторяться
-        String jsonBodyToSend = """
-                 {
-                   "username": "leonardo",
-                   "password": "leads"
-                 }
-                """;
+//        String jsonBodyToSend = """
+//                 {
+//                   "username": "leonardo",
+//                   "password": "leads"
+//                 }
+//                """;
+        /*Код выше закомитили, т.к. мы создали класс рекорд (не требует делать конструктор и геттеры, т.к
+        они автоматически создаются, хоть мы их и не видим) AuthRequest и там прописали данные поля
+        username и password. Ну а в коде ниже создали объект класса AuthRequest. В результате кода станет меньше
+         */
 
-        AuthRequest authRequest = new AuthRequest("leonardo", "leads");
+        AuthRequest authRequest = new AuthRequest(username, password);//
 
-        return given()// ДАНО
+        AuthResponse authResponse = given()// ДАНО
                 .basePath("auth/login")
-                .body(jsonBodyToSend)
+                .body(authRequest)// плюсы REST - assured в том, что в нём уже встроен ObjectMapper от Jackson и он
+                // преобразует его в JSON.
                 .contentType(ContentType.JSON)
                 .when()// КОГДА
                 .post()// ШЛЁШЬ ПОСТ ЗАПРОС
-                .jsonPath().getString("userToken");/* использ. механизм JSONPath. Что это такое?
-                В REST - assured уже вставлен данный механизм. Который позволяет обратиться к
+        //.jsonPath().getString("userToken");/* использ. механизм JSONPath. Что это такое?*/
+                /*В REST - assured уже вставлен данный механизм. Который позволяет обратиться к
                 какому - либо из полей JSON файла. А можно это сделать с помощью "$.userToken" (но его
                  не нужно ставить, он установлен по умолчанию), после точки ставим как раз путь (ключ) и
                 получаем значение. Особенно удобен данный метод, если мы обращаемся к полю один раз,
@@ -187,6 +200,10 @@ public class CompanyContractTest {
                 Тем самым в REST - assured, мы можем работать с JSON, без создания
                 обжект маппера, как мы это делали ранее.
                 Попрактиваться с JSONPath можно например на сайте https://jsonpath.com/*/
+                .as(AuthResponse.class);
+
+        return authResponse.userToken(); //так как поле userToken мы создавали не в классе, в Record, то здесь
+        //мы не пишем get userToken, а пишем просто userToken. Необходимо не забывать об этом
     }
 
 
