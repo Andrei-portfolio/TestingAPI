@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.http.ContentType;
-import x_clients.rest_assured.entity.AuthRequest;
-import x_clients.rest_assured.entity.AuthResponse;
 import x_clients.rest_assured.entity.CreateCompanyRequest;
 import x_clients.rest_assured.entity.CreateCompanyResponse;
 
@@ -18,17 +16,21 @@ public class ApiCompanyHelper {
         authHelper = new AuthHelper();
     }
     public CreateCompanyResponse createCompany(){
-        CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
+                CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
 
-        return given()  // ДАНО:
+        return given()// ДАНО
                 .basePath("company")
-                .body(createCompanyRequest)
+                .body(createCompanyRequest)//плюсы REST - assured в том, что в нём уже встроен ObjectMapper от Jackson и он
+                // преобразует его в JSON.
                 .contentType(ContentType.JSON)
-                .when()     // КОГДА
-                .post() // ШЛЕШЬ ПОСТ ЗАПРОС
+                //.header("x-client-token", userToken)// ВАЖНО: обязательно прокидываем токен, иначе автотест не отработает
+                .when()// КОГДА
+                .post()// ШЛЁШЬ ПОСТ ЗАПРОС
                 .then()
                 .statusCode(201)
-                .body("id", is(greaterThan(0)))
+                .body("id", is(greaterThan(0)))// это в REST - assured  есть hamcrest.Matchers.is.
+                // проверяем, что id больше 0
+                //.extract().jsonPath().getString("id");// В терминал видим id нашей компании
                 .extract().as(CreateCompanyResponse.class);
     }
 
@@ -37,6 +39,7 @@ public class ApiCompanyHelper {
 
         return given()  // ДАНО:
                 .basePath("company/delete")
+                //.header("x-client-token", userToken)
                 .when()     // КОГДА
                 .get("{id}", id) // ШЛЕШЬ ПОСТ ЗАПРОС
                 .jsonPath().getInt("id");

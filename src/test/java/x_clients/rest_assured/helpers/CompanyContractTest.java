@@ -37,18 +37,21 @@ public class CompanyContractTest {
 
     private final static String URL = "https://x-clients-be.onrender.com/";
 
-//    private static ApiCompanyHelper apiCompanyHelper;
-//    private static AuthHelper authHelper;
+    private static ApiCompanyHelper apiCompanyHelper;
+
+    private static AuthHelper authHelper;
 
     @BeforeAll
     public static void setUp() {
         RestAssured.baseURI = URL;//чтобы не задавать в каждом тесте baseUri, пропишем
         // его здесь в виде переменной из RestAssured
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();// Логирование. Если тест упадёт, то в консоле будет риспунс и реквест
+        //Если же хотим логировать всё, то в каждом тесте после given() пишем .log().all()
+        apiCompanyHelper = new ApiCompanyHelper();
+        authHelper = new AuthHelper();
 
-//        apiCompanyHelper = new ApiCompanyHelper();
-//        authHelper = new AuthHelper();
-//        String userToken = authHelper.authAndGetToken("leonardo", "leads");
-//        RestAssured.requestSpecification = new RequestSpecBuilder().build().header("x-client-token", userToken);
+        String userToken = authHelper.authAndGetToken("leonardo", "leads");
+        RestAssured.requestSpecification = new RequestSpecBuilder().build().header("x-client-token", userToken);
     }
 
     /*Рассмотрим три основных метода
@@ -61,7 +64,7 @@ public class CompanyContractTest {
     @Test
     @DisplayName("Код ответа при получении списка компаний")
     public void getCompanyList() {
-        given()  // ДАНО:
+        given().log().all()  // ДАНО:// Поставили логирование для данного теста .log().all(). Даже если он не упадёт, в консоль выдаст данные
                 //.baseUri(URL + "company")// Данный код закомитим, т.к мы задали URL выше в
                 // @BeforeAll. Поэтому, теперь нижней строкой пропишем basePath, без URL
                 .basePath ("company")
@@ -112,8 +115,7 @@ public class CompanyContractTest {
     @Test
     @DisplayName("Создание компании")
     public void createCompany() {
-        String userToken = authAndGetToken("leonardo", "leads");// Благодаря методу authAndGetToken мы вынесли авторизацию в предусловие
-        CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
+
 //        String jsonBodyToSend = """
 //                {
 //                   "name": "RestAssuredCompany",
@@ -126,30 +128,43 @@ public class CompanyContractTest {
          приведём всё к единобразию. А код выше, закомитим */
 
 
-       CreateCompanyResponse createCompanyResponse = given()// ДАНО
-                .basePath("company")
-                .body(createCompanyRequest)//плюсы REST - assured в том, что в нём уже встроен ObjectMapper от Jackson и он
-                                    // преобразует его в JSON.
-                .contentType(ContentType.JSON)
-                .header("x-client-token", userToken)// ВАЖНО: обязательно прокидываем токен, иначе автотест не отработает
-                .when()// КОГДА
-                .post()// ШЛЁШЬ ПОСТ ЗАПРОС
-                .then()
-                .statusCode(201)
-                .body("id", is(greaterThan(0)))// это в REST - assured  есть hamcrest.Matchers.is.
-                // проверяем, что id больше 0
-                //.extract().jsonPath().getString("id");// В терминал видим id нашей компании
-                .extract().as(CreateCompanyResponse.class);
-
+        CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();
         System.out.println(createCompanyResponse.id());// В данном тесте приведен пример, как по итогам теста мы кроме сравнения
         // вытащим в терминал id. В свагере проверяем, на самом ли деле создалась наша компания с данным id
-
-
-        /*CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();
-
-        System.out.println(createCompanyResponse.id());
-    }*/
     }
+
+
+
+        @Test
+        @Disabled("Разобразться с авторизацией")
+        @DisplayName("Создание компании выдает код 401 за клиента")
+        public void createCompanyWithClientUser() {
+            String userToken = authHelper.authAndGetToken("stella", "sun-fairy");
+            CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
+
+            String errorMessage = given()  // ДАНО:
+                    .basePath("company")
+                    .body(createCompanyRequest)
+                    .contentType(ContentType.JSON)
+                    .header("x-client-token", userToken)
+                    .when()     // КОГДА
+                    .post() // ШЛЕШЬ ПОСТ ЗАПРОС
+                    .then()
+                    .statusCode(403).extract().asPrettyString();
+
+            System.out.println(errorMessage);
+        }
+
+        /*CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();*/
+
+
+        @Test
+        @DisplayName("Удаление компании")
+        public void deleteCompany() {
+            CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();//Чтобы удалить, сначала создаём
+            int deletedObjectId = apiCompanyHelper.deleteCompany(createCompanyResponse.id());
+            assertEquals(createCompanyResponse.id(), deletedObjectId);
+        }
 
     @Test
     @DisplayName("Получить компанию по id")
@@ -169,68 +184,6 @@ public class CompanyContractTest {
         поменяться, т.е. появляется новая структура, выносятся методы и т.д. Т.е. облагораживание кода
         */
 
-    private String authAndGetToken (String username, String password) {// Метод который авторизуется и проверяет токен. Данный метод будем
-        // использовать перед каждым тестом. Тем самым код не будет повторяться
-//        String jsonBodyToSend = """
-//                 {
-//                   "username": "leonardo",
-//                   "password": "leads"
-//                 }
-//                """;
-        /*Код выше закомитили, т.к. мы создали класс рекорд (не требует делать конструктор и геттеры, т.к
-        они автоматически создаются, хоть мы их и не видим) AuthRequest и там прописали данные поля
-        username и password. Ну а в коде ниже создали объект класса AuthRequest. В результате кода станет меньше
-         */
-
-        AuthRequest authRequest = new AuthRequest(username, password);//
-
-        AuthResponse authResponse = given()// ДАНО
-                .basePath("auth/login")
-                .body(authRequest)// плюсы REST - assured в том, что в нём уже встроен ObjectMapper от Jackson и он
-                // преобразует его в JSON.
-                .contentType(ContentType.JSON)
-                .when()// КОГДА
-                .post()// ШЛЁШЬ ПОСТ ЗАПРОС
-        //.jsonPath().getString("userToken");/* использ. механизм JSONPath. Что это такое?*/
-                /*В REST - assured уже вставлен данный механизм. Который позволяет обратиться к
-                какому - либо из полей JSON файла. А можно это сделать с помощью "$.userToken" (но его
-                 не нужно ставить, он установлен по умолчанию), после точки ставим как раз путь (ключ) и
-                получаем значение. Особенно удобен данный метод, если мы обращаемся к полю один раз,
-                но если придётся обращаться неоднократно, то лучьше создать объект класса.
-                Тем самым в REST - assured, мы можем работать с JSON, без создания
-                обжект маппера, как мы это делали ранее.
-                Попрактиваться с JSONPath можно например на сайте https://jsonpath.com/*/
-                .as(AuthResponse.class);
-
-        return authResponse.userToken(); //так как поле userToken мы создавали не в классе, в Record, то здесь
-        //мы не пишем get userToken, а пишем просто userToken. Необходимо не забывать об этом
-    }
 
 
-    /*@Test
-    @DisplayName("Удаление компании")
-    public void deleteCompany() {
-        CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();
-        int deletedObjectId = apiCompanyHelper.deleteCompany(createCompanyResponse.id());
-        assertEquals(createCompanyResponse.id(), deletedObjectId);
-    }
-
-    @Test
-    @Disabled("Разобразться с авторизацией")
-    @DisplayName("Создание компании выдает код 401 за клиента")
-    public void createCompanyWithClientUser() {
-        String userToken = authHelper.authAndGetToken("stella", "sun-fairy");
-        CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
-
-        String errorMessage = given()  // ДАНО:
-                .basePath("company")
-                .body(createCompanyRequest)
-                .contentType(ContentType.JSON)
-                .header("x-client-token", userToken)
-                .when()     // КОГДА
-                .post() // ШЛЕШЬ ПОСТ ЗАПРОС
-                .then()
-                .statusCode(403).extract().asPrettyString();
-        System.out.println(errorMessage);
-    }*/
 }
