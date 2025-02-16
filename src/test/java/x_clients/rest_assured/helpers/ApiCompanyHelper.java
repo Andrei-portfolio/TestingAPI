@@ -16,6 +16,7 @@ public class ApiCompanyHelper {
         authHelper = new AuthHelper();
     }
     public CreateCompanyResponse createCompany(){
+//        String userToken = authHelper.authAndGetToken("leonardo", "leads");
                 CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
 
         return given()// ДАНО
@@ -23,7 +24,7 @@ public class ApiCompanyHelper {
                 .body(createCompanyRequest)//плюсы REST - assured в том, что в нём уже встроен ObjectMapper от Jackson и он
                 // преобразует его в JSON.
                 .contentType(ContentType.JSON)
-                //.header("x-client-token", userToken)// ВАЖНО: обязательно прокидываем токен, иначе автотест не отработает
+//                .header("x-client-token", userToken)// ВАЖНО: обязательно прокидываем токен, иначе автотест не отработает
                 .when()// КОГДА
                 .post()// ШЛЁШЬ ПОСТ ЗАПРОС
                 .then()
@@ -36,10 +37,11 @@ public class ApiCompanyHelper {
 
 
     public int deleteCompany(int id) {
+//        String userToken = authHelper.authAndGetToken("leonardo", "leads");
 
         return given()  // ДАНО:
                 .basePath("company/delete")
-                //.header("x-client-token", userToken)
+//                .header("x-client-token", userToken)
                 .when()     // КОГДА
                 .get("{id}", id) // ШЛЕШЬ ПОСТ ЗАПРОС
                 .jsonPath().getInt("id");

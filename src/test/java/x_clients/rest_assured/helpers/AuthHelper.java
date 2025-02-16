@@ -8,7 +8,7 @@ import x_clients.rest_assured.entity.AuthResponse;
 
 public class AuthHelper {
 
-    String authAndGetToken(String username, String password) {// Метод который авторизуется и проверяет токен. Данный метод будем
+    public String authAndGetToken(String username, String password) {// Метод который авторизуется и проверяет токен. Данный метод будем
         // использовать перед каждым тестом. Тем самым код не будет повторяться
 //        String jsonBodyToSend = """
 //                 {
@@ -48,19 +48,5 @@ public class AuthHelper {
 
 
 
-    /*public String authAndGetToken(String username, String password) {
 
-        AuthRequest authRequest = new AuthRequest(username, password);
-
-        AuthResponse authResponse = given()
-                .basePath("auth/login")
-                .body(authRequest)
-                .contentType(ContentType.JSON)
-                .header("x-client-token", "")
-                .when()
-                .post()
-                .as(AuthResponse.class);
-
-        return authResponse.userToken();
-    }*/
 }
