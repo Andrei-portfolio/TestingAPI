@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.http.ContentType;
+import x_clients.rest_assured.entity.Company;
 import x_clients.rest_assured.entity.CreateCompanyRequest;
 import x_clients.rest_assured.entity.CreateCompanyResponse;
 
@@ -46,5 +47,15 @@ public class ApiCompanyHelper {
                 .get("{id}", id) // ШЛЕШЬ ПОСТ ЗАПРОС
                 .jsonPath().getInt("id");
     }
+
+    public Company getCompany(int id) {
+
+        return given()  // ДАНО:
+                .basePath("company/delete")
+                .when()     // КОГДА
+                .get("{id}", id) // ШЛЕШЬ ПОСТ ЗАПРОС
+                .as(Company.class);
+    }
+
 
 }
