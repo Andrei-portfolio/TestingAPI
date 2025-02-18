@@ -5,9 +5,12 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import x_clients.rest_assured.entity.Company;
 import x_clients.rest_assured.entity.CreateCompanyRequest;
 import x_clients.rest_assured.entity.CreateCompanyResponse;
+
+import java.util.Optional;
 
 public class ApiCompanyHelper {
 
@@ -48,13 +51,20 @@ public class ApiCompanyHelper {
                 .jsonPath().getInt("id");
     }
 
-    public Company getCompany(int id) {
+    public Optional<Company> getCompany(int id) {// Возможно вернётся Company
 
-        return given()  // ДАНО:
-                .basePath("company/delete")
+        Response response =
+        given()  // ДАНО:
+                .basePath("company")
                 .when()     // КОГДА
-                .get("{id}", id) // ШЛЕШЬ ПОСТ ЗАПРОС
-                .as(Company.class);
+                .get("{id}", id); // ШЛЕШЬ ПОСТ ЗАПРОС
+
+        String header = response.header("Content-Length");
+        if (header != null && header.equals("0"))
+        {
+            return Optional.empty();// Верни еам пустоту, пустой объект
+        }
+        return Optional.of(response.as(Company.class));
     }
 
 

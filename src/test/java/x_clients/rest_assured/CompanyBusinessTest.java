@@ -40,14 +40,15 @@ public class CompanyBusinessTest {
 
 
         @Test
-    public void deleteCompany(CreateCompanyResponse createCompanyResponse) throws InterruptedException {
+    public void deleteCompany(ApiCompanyHelper apiCompanyHelper, CreateCompanyResponse createCompanyResponse)
+                throws InterruptedException {
 
             //CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany(); //Создать компанию (Предусловие). Закомитил, т.к. вынесли выше в скобках
             apiCompanyHelper.deleteCompany(createCompanyResponse.id());//Удалить компанию
             Thread.sleep(3000);//Так как тест не стабильный (удаление происх. не сразу а с запозд. на неск сек),
             // данная строка кода позволяет нам отсрочить время после удаления на 3 сек. Можно пост и больше
-            Company company = apiCompanyHelper.getCompany(createCompanyResponse.id());//Проверить через GET, что компании больше нет
-            System.out.println(company);
+            Optional<Company> company = apiCompanyHelper.getCompany(createCompanyResponse.id());//Проверить через GET, что компании больше нет
+            assertTrue(company.isEmpty());// проверь, что компании нет
         }
             /*ВАЖНО!!! Пока в классе Company не поставим аннотацию @JsonIgnoreProperties, которая игнорирует неизвестные поля
  тест deleteCompany не будет работать*/
@@ -58,11 +59,12 @@ public class CompanyBusinessTest {
 //        // Проверить через GET, что компании больше нет
 //    }
 //
-    public void deleteNotExistentCompany() throws InterruptedException {
+    public void deleteNotExistentCompany(ApiCompanyHelper apiCompanyHelper) throws InterruptedException {
+
         apiCompanyHelper.deleteCompany(666666);
         Thread.sleep(3000);
         //Optional<Company> company = apiCompanyHelper.getCompany(666666);
-                Company company = apiCompanyHelper.getCompany(666666);
+        Optional<Company> company = apiCompanyHelper.getCompany(666666);
         System.out.println(company);
         // Проверить через GET, что компании больше нет
     }
