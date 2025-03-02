@@ -37,3 +37,15 @@ https://mvnrepository.com/artifact/org.instancio/instancio-junit/5.0.2. Дале
 А плюс в том, что данный список не в одну строчку, если бы мы не дебажили,
 а каждаю задача отдельно. Можно посмотреть каждое поле
 
+Лайф хак, как изменить код не в одном месте, а сразу в нескольких, во всем файле, или в нескольких классах
+Стоя на названии метода нажимаем ПКМ -- Refactor -- Change Signature -- нажимаем на плюсик и прописываем 
+Type:String 
+Name:name
+Default value: "Entity company"
+
+Повторно нажимаем на плюсик и прописываем
+Type:String
+Name:description
+Default value: "desc with entity"
+
+Ну и далее нажимаем "Refactor"

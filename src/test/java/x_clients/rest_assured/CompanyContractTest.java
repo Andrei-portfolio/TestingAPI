@@ -1,20 +1,18 @@
 package x_clients.rest_assured;
 
-import static io.restassured.RestAssured.basePath;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.ResponseSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import x_clients.rest_assured.entity.AuthRequest;
-import x_clients.rest_assured.entity.AuthResponse;
 import x_clients.rest_assured.entity.CreateCompanyRequest;
 import x_clients.rest_assured.entity.CreateCompanyResponse;
 import x_clients.rest_assured.helpers.ApiCompanyHelper;
@@ -130,7 +128,9 @@ public class CompanyContractTest {
          приведём всё к единобразию. А код выше, закомитим */
 
 
-        CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();
+        CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany(
+                "Entity company",
+                "desc with entity");
         System.out.println(createCompanyResponse.id());// В данном тесте приведен пример, как по итогам теста мы кроме сравнения
         // вытащим в терминал id. В свагере проверяем, на самом ли деле создалась наша компания с данным id
     }
@@ -139,7 +139,9 @@ public class CompanyContractTest {
     @Test
     @DisplayName("Удаление компании")
     public void deleteCompany() {
-        CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany();//Чтобы удалить, сначала создаём
+        CreateCompanyResponse createCompanyResponse = apiCompanyHelper.createCompany(
+                "Entity company",
+                "desc with entity");//Чтобы удалить, сначала создаём
         int deletedObjectId = apiCompanyHelper.deleteCompany(createCompanyResponse.id());
         assertEquals(createCompanyResponse.id(), deletedObjectId);
     }
@@ -185,5 +187,20 @@ public class CompanyContractTest {
         поменяться, т.е. появляется новая структура, выносятся методы и т.д. Т.е. облагораживание кода
         */
 
+    @Test
+    public void testSomething() {
+        ResponseSpecBuilder responseSpecBuilder = new ResponseSpecBuilder();
+        ResponseSpecification responseSpecification = responseSpecBuilder
+                .expectStatusCode(200)
+                .expectHeader("Content-Type", "application/json; charset=utf-8")
+                .build();
 
+        int id = 863;// важно поставить тот id, который есть в БД
+        given()  // ДАНО:
+                .basePath("company")
+                .when()
+                .get("{id}", id)
+                .then()
+                .spec(responseSpecification);
+    }
 }

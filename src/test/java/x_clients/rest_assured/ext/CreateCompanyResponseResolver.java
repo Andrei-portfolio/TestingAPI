@@ -19,6 +19,6 @@ public class CreateCompanyResponseResolver implements ParameterResolver {
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
         ApiCompanyHelper apiCompanyHelper = new ApiCompanyHelper();
-        return apiCompanyHelper.createCompany();
+        return apiCompanyHelper.createCompany("Entity company", "desc with entity");
     }
 }

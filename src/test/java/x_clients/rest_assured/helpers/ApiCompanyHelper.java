@@ -19,9 +19,9 @@ public class ApiCompanyHelper {
     public ApiCompanyHelper(){
         authHelper = new AuthHelper();
     }
-    public CreateCompanyResponse createCompany(){
+    public CreateCompanyResponse createCompany(String name, String description){
 //        String userToken = authHelper.authAndGetToken("leonardo", "leads");
-                CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest("Entity company", "with entity");
+                CreateCompanyRequest createCompanyRequest = new CreateCompanyRequest(name,description);
 
         return given()// ДАНО
                 .basePath("company")
@@ -38,7 +38,6 @@ public class ApiCompanyHelper {
                 //.extract().jsonPath().getString("id");// В терминал видим id нашей компании
                 .extract().as(CreateCompanyResponse.class);
     }
-
 
     public int deleteCompany(int id) {
 //        String userToken = authHelper.authAndGetToken("leonardo", "leads");
@@ -66,6 +65,4 @@ public class ApiCompanyHelper {
         }
         return Optional.of(response.as(Company.class));
     }
-
-
 }
