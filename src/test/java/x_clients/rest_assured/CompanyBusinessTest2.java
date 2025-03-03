@@ -30,10 +30,10 @@ public class CompanyBusinessTest2 {
 
     private static AuthHelper authHelper;
 
-    //ПОДКЛЮЧЕНИЕ к БД
-    private final static String connectionString = "jdbc:postgresql://dpg-cuofqqt2ng1s73e8pm2g-a.frankfurt-postgres.render.com/x_clients_ehy7";
-    private final static String login = "x_user";
-    private final static String password = "Mi4j6vZGytGHHMHhmHw86Q4MJ0YSLr1R";
+    //ПОДКЛЮЧЕНИЕ к БД (данный код закомитил, т.к. всё необходимое вынес в файл resources -- env.properties
+//    private final static String connectionString = "jdbc:postgresql://dpg-cuofqqt2ng1s73e8pm2g-a.frankfurt-postgres.render.com/x_clients_ehy7";
+//    private final static String login = "x_user";
+//    private final static String password = "Mi4j6vZGytGHHMHhmHw86Q4MJ0YSLr1R";
     private final static String name = "тест с бд";
     private final static String description = "описание с бд";
 

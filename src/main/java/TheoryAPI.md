@@ -1,6 +1,7 @@
 ссылка на 3 блок https://github.com/JetBrInno/Javalessons3ModuleApi/tree/master
 сайт Todo List https://sky-todo-list.herokuapp.com/
 API по созданию питомца https://petstore.swagger.io/
+Мой репозиторий на github https://github.com/Andrei-portfolio/certification3
 
 1. Клиент - серверная архитектура 
 Клиент (браузер) шлёт запрос на сервер, сервер нам сначала возвращает данные (html, xml, json и т.д.)

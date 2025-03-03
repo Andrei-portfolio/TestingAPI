@@ -4,19 +4,23 @@ import org.junit.jupiter.api.extension.*;
 import x_clients.rest_assured.db.CompanyRepository;
 import x_clients.rest_assured.db.CompanyRepositoryJDBC;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
+
+//import static x_clients.rest_assured.CompanyBusinessTest2.connectionString;
 
 public class CreateCompanyRepositoryResolver implements ParameterResolver, BeforeAllCallback, AfterAllCallback {
 
     private Connection connection;
 
-    private final static String connectionString = "jdbc:postgresql://dpg-cuofqqt2ng1s73e8pm2g-a.frankfurt-postgres.render.com/x_clients_ehy7";
-
-    private final static String login = "x_user";
-
-    private final static String password = "Mi4j6vZGytGHHMHhmHw86Q4MJ0YSLr1R";
+//    private final static String connectionString = "jdbc:postgresql://dpg-cuofqqt2ng1s73e8pm2g-a.frankfurt-postgres.render.com/x_clients_ehy7";
+//
+//    private final static String login = "x_user";
+//
+//    private final static String password = "Mi4j6vZGytGHHMHhmHw86Q4MJ0YSLr1R";
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
@@ -36,12 +40,19 @@ public class CreateCompanyRepositoryResolver implements ParameterResolver, Befor
         connection.close();
     }
 
-    @Override
+    @Override //закомиченный код выше (connectionString, login, password) и код в файле resources -- env.properties необходимы
+    // для того, чтобы подобного рода паролей, логин хранить в одном месте
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
-        try {
-            connection = DriverManager.getConnection(connectionString, login, password);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        String appConfigPath = rootPath + "env.properties";
+
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(appConfigPath));
+
+        String connectionString = properties.getProperty("db.connectionString");
+        String login = properties.getProperty("db.login");
+        String password = properties.getProperty("db.password");
+
+        connection = DriverManager.getConnection(connectionString, login, password);
     }
 }
