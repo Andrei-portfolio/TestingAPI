@@ -41,7 +41,7 @@ public class CreateCompanyRepositoryResolver implements ParameterResolver, Befor
     }
 
     @Override //закомиченный код выше (connectionString, login, password) и код в файле resources -- env.properties необходимы
-    // для того, чтобы подобного рода паролей, логин хранить в одном месте
+    // для того, чтобы подобного рода паролей, логин хранить в одном месте. Ниже пропишем код подключения к БД
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         String appConfigPath = rootPath + "env.properties";
