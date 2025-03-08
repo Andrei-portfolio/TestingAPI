@@ -1,7 +1,11 @@
-ссылка на 3 блок https://github.com/JetBrInno/Javalessons3ModuleApi/tree/master
+ссылка на 3 блок https://github.com/JetBrInno/Javalessons3ModuleApi/tree/master 
+ОЧЕНЬ ВАЖНО!!! В РЕПОЗИТОРИИ github ПРЕДСТАВЛЕНО ДВЕ ВЕТКИ master и test_with_db. В ЗАВИСИМОСТИ ОТ ВЫБОРА ОДНОЙ
+ИЗ ДАННЫХ ВЕТОК, БУДЕТ ЗАВИСИТЬ КАКОЙ КОД И КЛАССЫ БУДУТ ТАМ ПРЕДСТАВЛЕНЫ. НА ПЕРВОЙ ВЕТКЕ В ОСНОВНОМ, ПЕРВЫЙ
+СПОСОБ РАБОТЫ С БД с помощью JDBC, НА ВТОРОЙ ВЕТКЕ ВТОРОЙ СПОСОБ С ПОМОЩЬЮ ХЕБЕРНЕТТА (hibernate)
+
 сайт Todo List https://sky-todo-list.herokuapp.com/
 API по созданию питомца https://petstore.swagger.io/
-Мой репозиторий на github https://github.com/Andrei-portfolio/certification3
+Мой репозиторий на github https://github.com/Andrei-portfolio/TestingAPI
 
 1. Клиент - серверная архитектура 
 Клиент (браузер) шлёт запрос на сервер, сервер нам сначала возвращает данные (html, xml, json и т.д.)
