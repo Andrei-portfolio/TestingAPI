@@ -195,7 +195,7 @@ public class CompanyContractTest {
                 .expectHeader("Content-Type", "application/json; charset=utf-8")
                 .build();
 
-        int id = 863;// важно поставить тот id, который есть в БД
+        int id = 1089;// важно поставить тот id, который есть в БД
         given()  // ДАНО:
                 .basePath("company")
                 .when()

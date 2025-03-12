@@ -77,7 +77,7 @@ public class JPADemo {
     @Test
     @DisplayName("Получение конкретной компании из БД по НАЗВАНИЮ")
     public void getCompanyFromDBByName() {
-        String name = "Кондитерская Профи-тролли";//Важно поставить НАЗВАНИЕ той компани, которая есть в БД.
+        String name = "Муж на час";//Важно поставить НАЗВАНИЕ той компани, которая есть в БД.
         // И выбирать название той компании, которая не по повторяется. Т.е. уникальную. Иначе будет ошибка
         TypedQuery<CompanyEntity> query = entityManager
                 .createQuery("SELECT ce FROM CompanyEntity ce WHERE ce.name = :name", CompanyEntity.class);
